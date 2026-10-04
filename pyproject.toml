@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openwire-client"
+version = "0.1.0"
+description = "Pure-Python OpenWire (ActiveMQ / Artemis JMS) client: queues, topics, durable subscriptions and TLS. Standard library only."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["activemq", "artemis", "jms", "openwire", "asyncio"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Framework :: AsyncIO",
+    "Topic :: System :: Networking",
+]
+
+[project.urls]
+Homepage = "https://github.com/Zaga-Solutions/openwire-client"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+openwire_client = ["py.typed"]

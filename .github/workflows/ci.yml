@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.12', '3.14']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e .
+      - run: python -m unittest tests.test_wire -v
+
+  brokers:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        broker: [artemis, classic]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -e .
+      - name: Start ${{ matrix.broker }}
+        run: |
+          if [ "${{ matrix.broker }}" = artemis ]; then
+            docker run -d --name broker -p 61616:61616 -e ARTEMIS_USER=admin -e ARTEMIS_PASSWORD=admin apache/activemq-artemis:latest-alpine
+          else
+            docker run -d --name broker -p 61616:61616 apache/activemq-classic:5.19.2
+          fi
+          for i in $(seq 1 60); do docker logs broker 2>&1 | grep -q -E "Server is now live|Apache ActiveMQ .* started|Connector openwire started" && break; sleep 2; done
+          sleep 3
+      - run: python -m unittest tests.test_broker -v
+        env:
+          OPENWIRE_TEST_BROKER: localhost:61616
+          OPENWIRE_TEST_USER: admin
+          OPENWIRE_TEST_PASSWORD: admin
+      - if: failure()
+        run: docker logs broker 2>&1 | tail -50
+
+  tls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -e .
+      - run: tests/tls_broker.sh start "$RUNNER_TEMP/pki"
+      - name: Run all tests against the plain and TLS ports
+        run: python -m unittest discover -s tests -v
+        env:
+          OPENWIRE_TEST_BROKER: localhost:61616
+          OPENWIRE_TEST_USER: artemis
+          OPENWIRE_TEST_PASSWORD: artemis
+          OPENWIRE_TEST_TLS_BROKER: localhost:61617
+          OPENWIRE_TEST_TLS_MTLS_BROKER: localhost:61618
+          OPENWIRE_TEST_TLS_CA: ${{ runner.temp }}/pki/ca.pem
+          OPENWIRE_TEST_TLS_CERT: ${{ runner.temp }}/pki/client.pem
+          OPENWIRE_TEST_TLS_KEY: ${{ runner.temp }}/pki/client.key
+      - if: failure()
+        run: docker logs openwire-tls-test 2>&1 | tail -50
