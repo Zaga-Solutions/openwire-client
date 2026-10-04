@@ -23,7 +23,7 @@ from .openwire import OpenWireClient
 from .tls import TlsOptions, build_ssl_context, explain_connect_error
 from .url import Endpoint, parse_broker_url
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 __all__ = [
     'BrokerClient', 'BrokerError', 'Endpoint', 'Envelope', 'Handler', 'OpenWireClient', 'QUEUE', 'TEMP_QUEUE',

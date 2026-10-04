@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openwire-client"
-version = "0.1.1"
+version = "0.1.2"
 description = "Pure-Python OpenWire (ActiveMQ / Artemis JMS) client: queues, topics, durable subscriptions and TLS. Standard library only."
 readme = "README.md"
 license = "MIT"

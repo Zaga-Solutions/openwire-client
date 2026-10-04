@@ -149,10 +149,12 @@ class TlsOptionsTests(unittest.TestCase):
 
     def test_missing_files_are_reported(self):
         missing = str(Path(tempfile.gettempdir()) / 'no-such-file.pem')
-        with self.assertRaises(OSError):
+        with self.assertRaisesRegex(OSError, 'cannot read ca_file .*no-such-file.pem'):
             build_ssl_context(TlsOptions(ca_file=missing))
-        with self.assertRaises(OSError):
+        with self.assertRaisesRegex(OSError, 'cannot read cert_file .*no-such-file.pem'):
             build_ssl_context(TlsOptions(cert_file=missing))
+        with self.assertRaisesRegex(OSError, 'cannot read JMS_TLS_CA_FILE'):
+            build_ssl_context(TlsOptions.from_env({'JMS_TLS_CA_FILE': missing}, prefix='JMS_TLS_'))
 
     def test_from_env(self):
         env = {'X_CA_FILE': 'ca.pem', 'X_CERT_FILE': 'c.pem', 'X_KEY_FILE': 'k.pem', 'X_KEY_PASSWORD': 'pw',

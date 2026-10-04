@@ -50,7 +50,7 @@ def build_ssl_context(tls: TlsOptions | None = None, verify_hostname: bool = Tru
     # are still verified; only this extra strictness is switched off.
     context.verify_flags &= ~ssl.VERIFY_X509_STRICT
     if tls.ca_file:
-        context.load_verify_locations(cafile=tls.ca_file)
+        _load(tls, 'ca_file', lambda: context.load_verify_locations(cafile=tls.ca_file))
     if tls.insecure:
         log.warning('TLS verification is switched off: broker certificates are NOT verified')
         context.check_hostname = False
@@ -58,8 +58,18 @@ def build_ssl_context(tls: TlsOptions | None = None, verify_hostname: bool = Tru
     elif not verify_hostname:
         context.check_hostname = False
     if tls.cert_file:
-        context.load_cert_chain(tls.cert_file, tls.key_file or None, tls.key_password or None)
+        _load(tls, 'cert_file', lambda: context.load_cert_chain(tls.cert_file, tls.key_file or None,
+                                                                tls.key_password or None))
     return context
+
+
+def _load(tls: TlsOptions, option: str, load) -> None:
+    """Runs a certificate-loading call; unreadable files are reported by name (the ssl module only says
+    'No such file or directory')."""
+    try:
+        load()
+    except OSError as e:
+        raise OSError(e.errno, f'cannot read {tls.name(option)} {getattr(tls, option)!r}: {e.strerror or e}') from e
 
 
 def explain_connect_error(endpoint: Endpoint, message: str, tls: TlsOptions | None = None) -> str:

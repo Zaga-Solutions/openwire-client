@@ -15,9 +15,9 @@ Not supported: transactions, selectors, `ssl://` keystores (use PEM files), send
 ## Install
 
 ```bash
-pip install "openwire-client @ git+https://github.com/Zaga-Solutions/openwire-client@v0.1.1"
+pip install "openwire-client @ git+https://github.com/Zaga-Solutions/openwire-client@v0.1.2"
 # no git available (e.g. a slim Docker build)? the same tag as an archive:
-pip install https://github.com/Zaga-Solutions/openwire-client/archive/refs/tags/v0.1.1.tar.gz
+pip install https://github.com/Zaga-Solutions/openwire-client/archive/refs/tags/v0.1.2.tar.gz
 ```
 
 Python 3.10 or later.
