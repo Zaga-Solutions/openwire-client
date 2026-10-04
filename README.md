@@ -15,9 +15,9 @@ Not supported: transactions, selectors, `ssl://` keystores (use PEM files), send
 ## Install
 
 ```bash
-pip install "openwire-client @ git+https://github.com/Zaga-Solutions/openwire-client@v0.1.0"
+pip install "openwire-client @ git+https://github.com/Zaga-Solutions/openwire-client@v0.1.1"
 # no git available (e.g. a slim Docker build)? the same tag as an archive:
-pip install https://github.com/Zaga-Solutions/openwire-client/archive/refs/tags/v0.1.0.tar.gz
+pip install https://github.com/Zaga-Solutions/openwire-client/archive/refs/tags/v0.1.1.tar.gz
 ```
 
 Python 3.10 or later.
@@ -118,3 +118,7 @@ OPENWIRE_TEST_BROKER=localhost:61616 OPENWIRE_TEST_USER=admin OPENWIRE_TEST_PASS
 client-certificate port (needs docker, openssl and keytool), then prints the variables for `tests/test_tls.py`.
 CI runs the unit tests on several Python versions and the broker and TLS tests against Artemis and ActiveMQ
 Classic containers.
+
+## License
+
+[MIT](LICENSE).
